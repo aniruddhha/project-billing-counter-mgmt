@@ -52,32 +52,20 @@
 - If mobile number is not available, simply customer not found message will be displayed
 - Bill Items will be stored in BillItems table
 - BillItems(id(pk), item(str), price(decimal), quantity(integer), billno(integer))
+- Bill items can be added and removed
+- price can not be zero or negative
+- item name can be alphanumeric
+- quantity can be non zero positive
+- 18 % GST will be added on total amount
 - Presently checkout is generating the bill
 
 ## Bill Details
+- Admin can see all bill details
+- All item details also displayed in tabular format
+- From the bill details admin can check customer details by clicking on mobile number
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## Analytics
+- Monthly sell can be displayed in bar chart format
+- Monthly sell should show Total Sell and Year
+- Product Sell should show pie chart of percentage of items sold
+- Product Sell should also show Total Items and Year
