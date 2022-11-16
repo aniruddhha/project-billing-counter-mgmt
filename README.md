@@ -1,7 +1,7 @@
 # Billing Counter Management
 >One of my customer is looking to develop app for managing their billing process. The system in discussion will have following features in the terms of REST API, Database Connectivity and proper UI.
 
-> This document can be understood better by keeping [wireframes](./wireframes-billing-counter-mgmt.pdf) in mind. 
+> This document can be understood better by keeping [wireframes](./wireframes-billing-counter-mgmt.pdf) in mind/front.
 
 
 ## Admin Login
