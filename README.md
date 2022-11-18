@@ -3,7 +3,7 @@
 
 **NOTE**
 
-> This document can be understood better by keeping [wireframes](./wireframes-billing-counter-mgmt.pdf) in mind/front.
+> This requirement document can be understood better by keeping [wireframes](./wireframes-billing-counter-mgmt.pdf) in mind/front.
 
 > Apply common sense where you need to. You can take a call for deciding on adding/removing/rectifying fields/database constraints/columns etc. Just make sure, complexity of application remains intact and you are not chaninging core the of app. 
 
