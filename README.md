@@ -24,6 +24,7 @@
 - Details of the customer can be displayed on click mobile number
 - New customers can be created
 - Customer can be searched by means of Mobile number
+- Field since and dob are defferent. since refers to created.
 
 ## New Customer
 - Simple interface for storing new customer
