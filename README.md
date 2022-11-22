@@ -20,6 +20,7 @@
 - Customer(id(pk), name (str), mobile (str unique), dob ,created) 
 - Feel free to change/modify above fileds
 - Customers can be deleted i.e. active flag set to false
+- User consent is required before update or delete i.e. Alert Dialog with yes no button
 - Details of the customer can be displayed on click mobile number
 - New customers can be created
 - Customer can be searched by means of Mobile number
