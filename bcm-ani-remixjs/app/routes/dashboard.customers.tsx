@@ -4,13 +4,13 @@ import { newCustomer, edit, delBtn } from "../icons"
 
 export default function Customers() {
     return (
-        <section className="container w-full h-full">
+        <section className="container w-full h-screen">
 
             <div className="flex justify-between items-center w-[80%] mt-5">
                 <h1 className="text-3xl mx-3 w-[20%]"> Customers </h1>
-                <div className="flex justify-between w-[30%]">
-                    <Link className="flex rounded-full border bg-lime-600 p-2 text-white" to={'../newcustomer'}> <span>{newCustomer}</span><span className="ml-1">Add</span></Link>
-                    <input type="text" placeholder="Search" className="bg-slate-200" />
+                <div className="flex items-center justify-between w-[30%]">
+                    <Link className="flex rounded-full border bg-lime-600 p-2 px-5 text-white" to={'../newcustomer'}> <span>{newCustomer}</span><span className="ml-1">Add</span></Link>
+                    <input type="text" placeholder="Search" className="bg-slate-200 h-10 p-3" />
                 </div>
             </div>
 

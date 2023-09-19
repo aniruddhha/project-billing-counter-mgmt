@@ -30,25 +30,25 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function NewCustomer() {
     return (
-        <section className="container">
+        <section className="container w-screen h-screen">
             <div className="mt-5">
                 <h1 className="text-3xl"> New Customer </h1>
             </div>
 
-            <div className="w-1/4 bg-white shadow-lg p-5 mt-5">
+            <div className="w-[50%] bg-white shadow-lg p-5 mt-5">
                 <div className="flex flex-col mt-5">
                     <Form method="post" className="grid grid-cols-2 gap-4">
                         <label htmlFor="name">Name</label>
-                        <input type="text" name="name" id="name" className="bg-slate-200" />
+                        <input type="text" name="name" id="name" className="bg-slate-200 h-10 p-2" placeholder="Name"/>
 
                         <label htmlFor="mobile">Mobile</label>
-                        <input type="text" name="mobile" id="mobile" className="bg-slate-200" />
+                        <input type="text" name="mobile" id="mobile" className="bg-slate-200 h-10 p-2" placeholder="Mobile"/>
 
                         <label htmlFor="mobile">Email</label>
-                        <input type="email" name="email" id="email" className="bg-slate-200" />
+                        <input type="email" name="email" id="email" className="bg-slate-200 h-10 p-2" placeholder="Email"/>
 
                         <label htmlFor="dob">Dob</label>
-                        <input type="date" name="dob" id="dob" className="bg-slate-200" />
+                        <input type="date" name="dob" id="dob" className="bg-slate-200 h-10 p-2" />
 
                         <div className="flex justify-end">
                             <input type="submit" value="Okay" className="bg-lime-600 rounded-full border p-2 text-white w-20" />
