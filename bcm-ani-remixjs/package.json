@@ -15,11 +15,14 @@
     "@remix-run/node": "^2.0.0",
     "@remix-run/react": "^2.0.0",
     "@remix-run/serve": "^2.0.0",
+    "chart.js": "^4.4.0",
     "concurrently": "^8.2.1",
     "isbot": "^3.6.8",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
-    "tailwindcss": "^3.3.3"
+    "tailwindcss": "^3.3.3",
+    "faker": "^6.6.6"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.0.0",

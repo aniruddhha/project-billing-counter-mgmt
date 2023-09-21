@@ -1,4 +1,3 @@
-import { newCustomer, edit, delBtn } from "../icons"
 
 export default function CustomerDetails() {
     return (
