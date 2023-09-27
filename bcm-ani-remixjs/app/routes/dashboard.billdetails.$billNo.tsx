@@ -1,5 +1,17 @@
+import { LoaderFunctionArgs, json } from "@remix-run/node";
+import { Link } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
+
+export async function loader({ params  }: LoaderFunctionArgs) {
+   
+    return json({ ...params })
+}
+
 export default function BillDetails() {
+    const { billNo } = useLoaderData<typeof loader>();
+
     return (
+        
         <section className="container flex flex-col w-screen h-screen">
             <div className="mt-5">
                 <h1 className="text-3xl"> Bill Details </h1>
@@ -9,10 +21,10 @@ export default function BillDetails() {
 
                 <div className="flex flex-col items-end w-[18%]">
                     <p className="flex justify-between w-full">
-                        <span>BILL #: </span><span>2023-01-01</span>
+                        <span>BILL #: </span><span>{billNo}</span>
                     </p>
                     <p className="flex justify-between w-full">
-                        <span>MOBILE:</span> <span><u>9003445</u></span>
+                        <span>MOBILE:</span> <Link to={`../customerdetails/${123}`}><u>9003445</u></Link>
                     </p>
                     <p className="flex justify-between w-full">
                         <span>PAYMENT</span> <span>CARD</span>
@@ -30,11 +42,7 @@ export default function BillDetails() {
                         <span>Counter:</span> <span>01</span>
                     </p>
                 </div>
-
-                
-
             </div>
-
                           
             <div className="w-[100%] mt-5">
                 <table className="table-fixed border-collapse border border-slate-300 w-[80%] bg-white shadow-lg">

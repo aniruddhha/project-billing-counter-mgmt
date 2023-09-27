@@ -1,8 +1,9 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 import { delBtn } from "../icons"
 import { v4 as uuidv4 } from 'uuid';
-import { Form } from "@remix-run/react";
-
+import { Form, useActionData } from "@remix-run/react";
+import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
+import { warning } from '../icons'
 
 interface BillItem {
     id: string;
@@ -17,6 +18,32 @@ interface IpError {
     quantity: { isInitial: boolean, msg: string, isValid: boolean };
 }
 
+export async function action({ request }: ActionFunctionArgs) {
+    const form = await request.formData();
+
+    const items = form.getAll('item');
+    const prices = form.getAll('price').map(Number);
+    const quantities = form.getAll('quantity').map(Number);
+    const mode = String(form.get('mode'))
+
+    if (items.length == 0 && prices.length == 0 && quantities.length == 0) {
+
+        return json({ msg: 'Invalid Form', isFormValid : false })
+    }
+
+    const raw = { items, prices, quantities }
+
+    const processed = items.map((item, index) => ({
+        'item': item,
+        'price': prices[index],
+        'quantity': quantities[index]
+    }))
+
+    const fineObj = { items: [...processed], mode }
+
+    return redirect('../bills')
+}
+
 
 export default function NewCustomer() {
 
@@ -26,11 +53,11 @@ export default function NewCustomer() {
 
     const [gst, setGst] = useState<number>(0)
 
-    const [billItem, setBillItem] = useState<BillItem>({ 
-        id: '', 
-        itemName : '', 
-        price :0, 
-        quantity : 0 
+    const [billItem, setBillItem] = useState<BillItem>({
+        id: '',
+        itemName: '',
+        price: 0,
+        quantity: 0
     })
 
     const [errors, setErrors] = useState<IpError>({
@@ -59,7 +86,7 @@ export default function NewCustomer() {
                 price: { isInitial: true, msg: 'Non zero Non negative', isValid: false },
                 quantity: { isInitial: true, msg: 'Non zero Non negative', isValid: false }
             })
-            setBillItem({ id : '', itemName :'', price: 0, quantity: 0 })
+            setBillItem({ id: '', itemName: '', price: 0, quantity: 0 })
         }
     }, [errors])
 
@@ -113,8 +140,12 @@ export default function NewCustomer() {
 
     const onIpChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setBillItem( old => ({ ...old, id: uuidv4(), [name] : value }))  
+        if ((name === "price" || name === "quantity") && isNaN(Number(value))) return;
+
+        setBillItem(old => ({ ...old, id: uuidv4(), [name]: value }))
     }
+
+    const actionData = useActionData<typeof action>();
 
     return (
         <section className="container flex flex-col w-screen h-screen">
@@ -166,7 +197,14 @@ export default function NewCustomer() {
                 </div>
             </div>
 
-            <div className="w-[100%] mt-5">
+            <Form method="post" className="w-[100%] mt-5">
+
+                { (actionData && (!actionData.isFormValid)) &&
+                    <div className="bg-red-600 w-[80%] flex items-start p-3 mb-5">
+                        <span className="text-white">{warning}</span><span className="ml-3 text-white">{actionData.msg}</span>
+                    </div>
+                }
+
                 <table className="table-fixed border-collapse border border-slate-300 w-[80%] bg-white shadow-lg">
                     <thead>
                         <tr className=" bg-slate-100 h-10">
@@ -182,13 +220,19 @@ export default function NewCustomer() {
                         {
                             billItems.map((item: BillItem, ind) =>
                                 <tr className="h-10" key={item.id}>
-                                    <td className="border border-slate-300 text-center">{ind + 1}</td>
-                                    <td className="border border-slate-300 text-left">
-                                        <span className="ml-3">{item.itemName}</span>
+                                    <td className="border border-slate-300 text-center overflow-hidden pointer-events-none">
+                                        <input type="text" value={ind + 1} className="w-full whitespace-nowrap bg-white text-center" readOnly />
                                     </td>
-                                    <td className="border border-slate-300 text-center">{item.price}</td>
-                                    <td className="border border-slate-300 text-center">{item.quantity}</td>
-                                    <td className="border border-slate-300 text-center">{item.price * item.quantity}</td>
+                                    <td className="border border-slate-300 text-left">
+                                        <input type="text" name='item' value={item.itemName} className="w-full whitespace-nowrap bg-white pl-3" readOnly />
+                                    </td>
+                                    <td className="border border-slate-300 text-center">
+                                        <input type="text" name='price' value={item.price} className="w-full whitespace-nowrap bg-white text-center" readOnly />
+                                    </td>
+                                    <td className="border border-slate-300 text-center">
+                                        <input type="text" name='quantity' value={item.quantity} className="w-full whitespace-nowrap bg-white text-center" readOnly />
+                                    </td>
+                                    <td className="border border-slate-300 text-center">{(item.price * item.quantity).toFixed(3)}</td>
                                     <td className="border border-slate-300 text-center">
                                         <span className="flex justify-center text-red-700" onClick={() => onDltClk(item)}>{delBtn}</span>
                                     </td>
@@ -200,33 +244,32 @@ export default function NewCustomer() {
                             <th className="border border-slate-300 text-right" colSpan={4}>
                                 <span className="mr-3">Total</span>
                             </th>
-                            <th className="border border-slate-300 text-center " >{totalAmount}</th>
+                            <th className="border border-slate-300 text-center " >{totalAmount.toFixed(3)}</th>
 
                         </tr>
                         <tr className="bg-slate-100 h-10">
                             <th className="border border-slate-300 text-right" colSpan={4}>
                                 <span className="mr-3">GST</span>
                             </th>
-                            <th className="border border-slate-300 text-center" >{gst}</th>
+                            <th className="border border-slate-300 text-center" >{gst.toFixed(3)}</th>
                         </tr>
                         <tr className="bg-slate-100 h-10">
                             <th className="border border-slate-300 text-right" colSpan={4}>
                                 <span className="mr-3">Grand Total</span>
                             </th>
-                            <th className="border border-slate-300 text-center" >{totalAmount + gst}</th>
+                            <th className="border border-slate-300 text-center" >{(totalAmount + gst).toFixed(3)}</th>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div className="flex flex-row-reverse w-[80%] mt-5">
-                <input type="button" value="Checkout" className="bg-lime-600 hover:bg-lime-700 active:bg-lime-800 focus:outline-none focus:ring focus:ring-lime-100 rounded-full border p-2 text-white w-28 ml-3" />
-                <select name="" id="" >
-                    <option value="upi">UPI</option>
-                    <option value="card">Card</option>
-                    <option value="cash">Cash</option>
-                </select>
-            </div>
+                <div className="flex flex-row-reverse w-[80%] mt-5">
+                    <input type="submit" value="Checkout" className="bg-lime-600 hover:bg-lime-700 active:bg-lime-800 focus:outline-none focus:ring focus:ring-lime-100 rounded-full border p-2 text-white w-28 ml-3" />
+                    <select name="mode">
+                        <option value="upi">UPI</option>
+                        <option value="card">Card</option>
+                        <option value="cash">Cash</option>
+                    </select>
+                </div>
+            </Form>
         </section>
     )
 }
