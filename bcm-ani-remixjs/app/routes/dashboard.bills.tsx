@@ -183,8 +183,7 @@ export default function Bills() {
 
     return (
         <section className="container w-screen">
-
-            {JSON.stringify(raw)}
+          
             <div className="flex justify-between items-center w-[80%] mt-5">
                 <h1 className="text-3xl mx-3 w-[20%]"> Bills </h1>
 

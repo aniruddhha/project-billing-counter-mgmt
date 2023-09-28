@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/node";
 
 import { newCustomer, edit, delBtn } from "../icons"
@@ -80,6 +80,8 @@ export async function loader() {
 
 export default function Customers() {
 
+    const navigate = useNavigate()
+
     const customers = useLoaderData<typeof loader>();
 
     const [searchTerm, setSearchTerm] = useState<string|undefined>(undefined)
@@ -99,9 +101,11 @@ export default function Customers() {
         setFiltered(flt)
     }, [searchTerm])
 
-    const onEdtClk = () => {}
+    const onEdtClk = (mobile ?: string) => {
+        navigate(`../editcustomer/${mobile}`)
+    }
 
-    const onDltClk = (mobile : string) => {
+    const onDltClk = (mobile ?: string) => {
        setDlgDtls({ isVs : true, ttl: 'Confirmation' , msg :`Do you want to delete ${mobile} ?`  })
     }
 
@@ -149,8 +153,8 @@ export default function Customers() {
                                     <td className="border border-slate-300 text-center">{dob?.toString()}</td>
                                     <td className="border border-slate-300 text-center">
                                         <span className="flex items-center justify-center">
-                                            <span className="text-blue-600 hover:bg-gray-300 active:text-blue-800 cursor-pointer" onClick={onEdtClk}>{edit}</span>
-                                            <span className="ml-2 text-red-600 hover:bg-gray-300 active:text-red-800 cursor-pointer" onClick={ () => onDltClk(mobile || '')}>{delBtn}</span>
+                                            <span className="text-blue-600 hover:bg-gray-300 active:text-blue-800 cursor-pointer" onClick={() => onEdtClk(mobile)}>{edit}</span>
+                                            <span className="ml-2 text-red-600 hover:bg-gray-300 active:text-red-800 cursor-pointer" onClick={ () => onDltClk(mobile)}>{delBtn}</span>
                                         </span>
                                     </td>
                                 </tr>
