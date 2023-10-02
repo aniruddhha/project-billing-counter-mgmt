@@ -67,7 +67,6 @@ export default function NewCustomer() {
     })
 
     useEffect(() => {
-
         const ttl = billItems.reduce((accumulator, item) => {
             return accumulator + (item.price * item.quantity);
         }, 0)

@@ -1,6 +1,43 @@
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
+import { json, LoaderFunctionArgs } from "@remix-run/node";
+
+export async function loader({ params } : LoaderFunctionArgs) {
+    return json({
+        cstDtls: {
+            mobile: `${params.mobile}`,
+            name: 'abc',
+            email: 'aa@ff.com',
+            dob: '1990-01-01'
+        },
+        rcTxns: [
+            {
+                billNo: "1234",
+                date: "2020-01-01",
+                amount: 112,
+                mode: "UPI",
+            },
+            {
+                billNo: "45678",
+                date: "2020-01-01",
+                amount: 980,
+                mode: "CARD",
+            },
+            {
+                billNo: "34568",
+                date: "2020-01-01",
+                amount: 980,
+                mode: "UPI",
+            },
+        ]
+    })
+}
 
 export default function CustomerDetails() {
+
+    const { cstDtls, rcTxns } = useLoaderData<typeof loader>();
+
+    const { mobile, name, email, dob } = cstDtls
+
     return (
         <section className="flex flex-col w-full h-screen">
             <div className="mt-5">
@@ -8,10 +45,10 @@ export default function CustomerDetails() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 w-1/4 h-fit bg-white shadow-lg p-5 mt-3">
-                <label >Mobile</label><label className="border-l pl-2">87900</label>
-                <label >Name</label><label className="border-l pl-2">Abc</label>
-                <label >Email</label><label className="border-l pl-2">Abc@dd.com</label>
-                <label >DOB</label><label className="border-l pl-2">1918-01-01</label>
+                <label >Mobile</label><label className="border-l pl-2">{mobile}</label>
+                <label >Name</label><label className="border-l pl-2">{name}</label>
+                <label >Email</label><label className="border-l pl-2">{email}</label>
+                <label >DOB</label><label className="border-l pl-2">{dob}</label>
             </div>
 
             <div className="mt-3">
@@ -30,13 +67,17 @@ export default function CustomerDetails() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="h-10">
-                            <td className="border border-slate-300 text-center">1</td>
-                            <td className="border border-slate-300 text-left"><Link to={`../billdetails/${123}`}><u className="ml-3">2301001</u></Link></td>
-                            <td className="border border-slate-300 text-center">2020-01-01</td>
-                            <td className="border border-slate-300 text-center">1890</td>
-                            <td className="border border-slate-300 text-center">UPI</td>
-                        </tr>
+                        {
+                            rcTxns.map(({billNo, date, amount, mode}, sr) =>
+                                <tr className="h-10">
+                                    <td className="border border-slate-300 text-center">{sr+1}</td>
+                                    <td className="border border-slate-300 text-left"><Link to={`../billdetails/${123}`}><u className="ml-3">{billNo}</u></Link></td>
+                                    <td className="border border-slate-300 text-center">{date}</td>
+                                    <td className="border border-slate-300 text-center">{amount}</td>
+                                    <td className="border border-slate-300 text-center">{mode}</td>
+                                </tr>
+                            )
+                        }
                     </tbody>
                 </table>
             </div>

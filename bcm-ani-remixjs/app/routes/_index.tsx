@@ -1,4 +1,5 @@
-import type { MetaFunction } from "@remix-run/node";
+import { ActionFunctionArgs, MetaFunction , redirect} from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -7,13 +8,21 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function action({ request }: ActionFunctionArgs) {
+  console.log('called')
+  return redirect('/dashboard')
+}
+
 export default function Index() {
+
+  const acDt = useActionData<typeof action>();
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div  className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <h3 className="text-2xl font-bold text-center">Login</h3>
       <h5 className="text-1xl text-gray-400">Sign In to Continue</h5>
       <div className="px-8 py-8 mt-4 text-left bg-white shadow-lg">
-        <form>
+        <Form method="post">
           <div className="mt-4">
             <label htmlFor="userName" className="block text-gray-400">Username</label>
             <input type="text" name="userName" id="userName" className="w-full px-4 py-2 border rounded-md" />
@@ -28,11 +37,12 @@ export default function Index() {
             />
           </div>
           <div className="mt-4">
-            <button type="submit" className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-md">
-              Login
-            </button>
+            <input 
+              type="submit" 
+              className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-md" 
+              value='Login'/>
           </div>
-        </form>
+        </Form>
       </div>
     </div>
   );

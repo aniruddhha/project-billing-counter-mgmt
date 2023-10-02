@@ -110,7 +110,7 @@ export default function Customers() {
     }
 
     return (
-        <section className="container w-full h-screen">
+        <section className="container w-screen h-screen">
             { 
                 dlgDtls.isVs && ( 
                             <AppDialog
