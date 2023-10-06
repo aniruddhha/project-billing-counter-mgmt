@@ -2,7 +2,10 @@ import { ActionFunctionArgs, redirect, json } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { ChangeEvent, useState } from "react";
 
-// import { Customer } from "~/domain/customer";
+import { CustomerRepository } from '../repository/customer-repository'
+import { ICustomer } from '../domain/customer-domain'
+
+const customerRepository = new CustomerRepository()
 
 interface IpError {
   name: { msg: string, isValid: boolean };
@@ -11,14 +14,7 @@ interface IpError {
   dob: { msg: string, isValid: boolean }
 }
 
-interface Customer {
-  name: string;
-  mobile: string;
-  email: string;
-  dob: Date
-}
-
-const validateFields = ({ name, mobile, email, dob }: Customer): IpError => {
+const validateFields = ({ name, mobile, email, dob }: ICustomer): IpError => {
   const error = {
     name: { msg: '', isValid: false },
     mobile: { msg: '', isValid: false },
@@ -80,10 +76,9 @@ export async function action({ request }: ActionFunctionArgs) {
   const email = form.get('email') as string
   const dt = form.get('dob') as string
 
-
   const dob = new Date(dt)
 
-  const customer: Customer = { name, mobile, email, dob }
+  const customer: ICustomer = { name, mobile, email, dob }
 
   const error = validateFields(customer)
 
@@ -93,6 +88,7 @@ export async function action({ request }: ActionFunctionArgs) {
     // })
 
     // cust.save()
+    await customerRepository.create(customer)
 
     return redirect(`../customers`)
   }

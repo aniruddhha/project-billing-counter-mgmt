@@ -18,11 +18,11 @@ export const links: LinksFunction = () => [
 
 const db = async () =>  {
   try {
-    const url = 'mongodb://localhost:27017/test';
+    const url = 'mongodb://localhost:27017/bcmdb';
     await mongoose.connect(url)
-    console.log(`Connected to Mongo`)
+    console.log(`🟢 Connected to Mongo`)
   } catch (err) {
-    console.error('Error connecting to MongoDB:', err);
+    console.error('🔴 Error connecting to MongoDB:', err);
   }
 }
 

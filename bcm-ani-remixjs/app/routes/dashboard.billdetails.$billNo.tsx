@@ -3,40 +3,26 @@ import { Link } from "@remix-run/react";
 import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
+import { IBill, IItem } from "~/domain/bill-domain";
+import { BillRepository } from '../repository/bill-repository'
+
+const billRepository = new BillRepository()
+
 export async function loader({ params  }: LoaderFunctionArgs) {
+
+    const blDtls: IBill = await billRepository.details(`${params.billNo}`)
+    const items: Array<IItem> = blDtls.items
+
     return json({
-        blDtls : {
-            billNo: `${params.billNo}`,
-            mobile:'12344',
-            mode: 'card',
-            date: '2022-01-01',
-            cashier: 'abc',
-            counter: 1
-        },
-        items :[
-            {
-                item : 'item1',
-                price: 555,
-                quantity: 80
-            },
-            {
-                item : 'item2',
-                price: 123,
-                quantity: 23
-            },
-            {
-                item : 'item3',
-                price: 789,
-                quantity: 1
-            }
-        ]
+        blDtls,
+        items 
     })
 }
 
 export default function BillDetails() {
     const { blDtls, items } = useLoaderData<typeof loader>();
 
-    const { billNo, mobile, mode, date, cashier, counter } = blDtls
+    const { billNo, customerMobile, mode,billDate, cashier, counter } = blDtls
 
     const [totalAmount, setTotalAmount] = useState<number>(0)
 
@@ -44,7 +30,7 @@ export default function BillDetails() {
 
     useEffect(() => {
         const ttl = items.reduce((accumulator, item) => {
-            return accumulator + (item.price * item.quantity);
+            return accumulator +  ( (item.price ? item.price : 0) * (item.quantity ? item.quantity : 0));
         }, 0)
         setTotalAmount(ttl)
 
@@ -66,7 +52,7 @@ export default function BillDetails() {
                         <span>BILL #: </span><span>{billNo}</span>
                     </p>
                     <p className="flex justify-between w-full">
-                        <span>MOBILE:</span> <Link to={`../customerdetails/${mobile}`}><u>{mobile}</u></Link>
+                        <span>MOBILE:</span> <Link to={`../customerdetails/${customerMobile}`}><u>{customerMobile}</u></Link>
                     </p>
                     <p className="flex justify-between w-full">
                         <span>PAYMENT</span> <span>{mode}</span>
@@ -75,7 +61,7 @@ export default function BillDetails() {
 
                 <div className="flex flex-col mr-3 items-end w-[18%]">
                     <p className="flex justify-between w-full">
-                        <span>Date: </span><span>{date}</span>
+                        <span>Date: </span><span>{new Date(billDate).toISOString().split('T')[0]}</span>
                     </p>
                     <p className="flex justify-between w-full">
                         <span>Cashier:</span> <span>{cashier}</span>
@@ -99,13 +85,13 @@ export default function BillDetails() {
                     </thead>
                     <tbody>
                         {
-                            items.map( ( {item, price, quantity}, sr) => 
+                            items.map( ( {itemName, price, quantity}, sr) => 
                                 <tr className="h-10">
                                     <td className="border border-slate-300 text-center">{sr+1}</td>
-                                    <td className="border border-slate-300 text-left"><span className="ml-3">{item}</span></td>
-                                    <td className="border border-slate-300 text-center">{price}</td>
-                                    <td className="border border-slate-300 text-center">{quantity}</td>
-                                    <td className="border border-slate-300 text-center">{ (price*quantity).toFixed(3)}</td>
+                                    <td className="border border-slate-300 text-left"><span className="ml-3">{itemName}</span></td>
+                                    <td className="border border-slate-300 text-center">{price ? price : ''}</td>
+                                    <td className="border border-slate-300 text-center">{quantity ? quantity : ''}</td>
+                                    <td className="border border-slate-300 text-center">{ (price && quantity) && (price*quantity).toFixed(3)}</td>
                                 </tr>
                             )
                         }

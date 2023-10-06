@@ -5,88 +5,24 @@ import { newCustomer, edit, delBtn } from "../icons"
 import { ChangeEvent, useEffect, useState } from "react";
 import { AppDialog, DialogDetails } from "~/dialog";
 
-interface Customer {
-    name: string | undefined;
-    mobile: string | undefined;
-    email: string | undefined;
-    dob: string | Date | undefined;
-}
+import { CustomerRepository } from '../repository/customer-repository'
+import { ICustomer } from '../domain/customer-domain'
 
+const customerRepository = new CustomerRepository()
 
 export async function loader() {
-    return json([
-        {
-            name: "John Smith",
-            mobile: "1234567890",
-            email: "john.smith@example.com",
-            dob: "1990-01-01",
-        },
-        {
-            name: "Jane Doe",
-            mobile: "2345678901",
-            email: "jane.doe@example.com",
-            dob: "1991-02-02",
-        },
-        {
-            name: "Michael Johnson",
-            mobile: "3456789012",
-            email: "michael.johnson@example.com",
-            dob: "1992-03-03",
-        },
-        {
-            name: "Emily Wilson",
-            mobile: "4567890123",
-            email: "emily.wilson@example.com",
-            dob: "1993-04-04",
-        },
-        {
-            name: "William Brown",
-            mobile: "5678901234",
-            email: "william.brown@example.com",
-            dob: "1994-05-05",
-        },
-        {
-            name: "Olivia Davis",
-            mobile: "6789012345",
-            email: "olivia.davis@example.com",
-            dob: "1995-06-06",
-        },
-        {
-            name: "James Lee",
-            mobile: "7890123456",
-            email: "james.lee@example.com",
-            dob: "1996-07-07",
-        },
-        {
-            name: "Sophia Taylor",
-            mobile: "8901234567",
-            email: "sophia.taylor@example.com", // Duplicate email
-            dob: "1997-08-08",
-        },
-        {
-            name: "Liam Anderson",
-            mobile: "9012345678",
-            email: "liam.anderson@example.com",
-            dob: "1998-09-09",
-        },
-        {
-            name: "Emma Wilson",
-            mobile: "9876543210",
-            email: "emma.wilson@example.com",
-            dob: "1999-10-10",
-        }
-    ])
+    return json((await customerRepository.customers()))
 }
 
 export default function Customers() {
 
     const navigate = useNavigate()
 
-    const customers = useLoaderData<typeof loader>();
+    const customers = useLoaderData<typeof loader>().map( cust => ({ ...cust, dob: new Date(cust.dob) }))
 
     const [searchTerm, setSearchTerm] = useState<string|undefined>(undefined)
 
-    const [filtered, setFiltered] = useState<Customer[]>(customers)
+    const [filtered, setFiltered] = useState<Array<ICustomer>>(customers)
 
     const [dlgDtls, setDlgDtls] = useState<DialogDetails>({ isVs: undefined, msg : undefined, ttl: undefined })
 
@@ -147,10 +83,10 @@ export default function Customers() {
                             filtered.map(({ name, mobile, email, dob }, sr) => (
                                 <tr className="h-10">
                                     <td className="border border-slate-300 text-center">{sr+1}</td>
-                                    <td className="border border-slate-300 text-left"><Link to={`../customerdetails/${234}`}><u className="ml-3">{mobile}</u></Link></td>
+                                    <td className="border border-slate-300 text-left"><Link to={`../customerdetails/${mobile}`}><u className="ml-3">{mobile}</u></Link></td>
                                     <td className="border border-slate-300 text-left"><span className="ml-3">{name}</span></td>
                                     <td className="border border-slate-300 text-left"><span className="ml-3">{email}</span></td>
-                                    <td className="border border-slate-300 text-center">{dob?.toString()}</td>
+                                    <td className="border border-slate-300 text-center">{dob?.toISOString().split('T')[0]}</td>
                                     <td className="border border-slate-300 text-center">
                                         <span className="flex items-center justify-center">
                                             <span className="text-blue-600 hover:bg-gray-300 active:text-blue-800 cursor-pointer" onClick={() => onEdtClk(mobile)}>{edit}</span>
