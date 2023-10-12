@@ -15,7 +15,7 @@ export default function Customers() {
             <div className='mt-5 ml-5 w-[80%]'>
                 <table className='table-fixed w-[100%] shadow-lg bg-white'>
                     <thead>
-                        <tr className='h-10'>
+                        <tr className='h-10 bg-slate-100'>
                             <th className='border border-slate-300 w-[5%]'>Sr</th>
                             <th className='border border-slate-300 w-[20%] text-left'><span className='ml-3'>Mobile</span></th>
                             <th className='border border-slate-300 w-[25%] text-left ml-3'><span className='ml-3'>Name</span></th>
@@ -27,7 +27,7 @@ export default function Customers() {
                     <tbody>
                         <tr className='h-10'>
                             <td className='border border-slate-300 text-center'>1</td>
-                            <td className='border border-slate-300 ml-3'><span className='ml-3'>9089786756</span></td>
+                            <td className='border border-slate-300 ml-3'><span className='ml-3'><Link to={`../customerdetails/${9876543214}`}><u>9876543214</u></Link></span></td>
                             <td className='border border-slate-300 ml-3'><span className='ml-3'>Abc</span></td>
                             <td className='border border-slate-300 ml-3'><span className='ml-3'>abc@dd.com</span></td>
                             <td className='border border-slate-300 text-center'>2000-01-01</td>
