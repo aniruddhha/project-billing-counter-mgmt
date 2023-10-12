@@ -1,7 +1,13 @@
-import { Link } from '@remix-run/react'
+import { Link, useNavigate } from '@remix-run/react'
 import {del, pencil } from '../icons'
 
 export default function Customers() {
+
+    const navigate = useNavigate()
+    
+    const onEdit = (mobile: string) => {
+        navigate(`../editcustomer/${mobile}`)
+    }
 
     return (
         <section className="container h-[100%]">
@@ -33,8 +39,8 @@ export default function Customers() {
                             <td className='border border-slate-300 text-center'>2000-01-01</td>
                             <td className='border border-slate-300 text-center'>
                                 <div className='flex justify-around items-center'>
-                                    <span className='text-blue-700'>{pencil}</span>
-                                    <span className='text-red-700'>{del}</span>
+                                    <span className='text-blue-400 cursor-pointer hover:text-blue-600 active:text-blue-800' onClick={() => onEdit('9876543214')}>{pencil}</span>
+                                    <span className='text-red-400 cursor-pointer hover:text-red-500 active:text-red-800'>{del}</span>
                                 </div>
                             </td>
                         </tr>
