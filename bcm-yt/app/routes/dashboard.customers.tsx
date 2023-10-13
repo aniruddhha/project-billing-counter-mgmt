@@ -1,7 +1,12 @@
 import { Link, useNavigate } from '@remix-run/react'
 import {del, pencil } from '../icons'
 
+import { AppDialog } from '~/dialog'
+import { useState } from 'react'
+
 export default function Customers() {
+
+    const [isDlgVs, setDlgVs] = useState<boolean>(false)
 
     const navigate = useNavigate()
     
@@ -9,8 +14,23 @@ export default function Customers() {
         navigate(`../editcustomer/${mobile}`)
     }
 
+    const onDelete = () => {
+        setDlgVs(true)
+    }
+
     return (
         <section className="container h-[100%]">
+
+            { isDlgVs && (
+                    <AppDialog 
+                        onOk={ () => setDlgVs(false) } 
+                        onClose={() => setDlgVs(false) }  
+                        msg = 'Do want to Delete ?'
+                        ttl='Confirmation'
+                    />
+                )
+            }
+
             <div className="w-[80%] flex justify-between items-center mt-5 ml-5">
                 <h1 className="text-4xl">Customers</h1>
                 <div>
@@ -40,7 +60,7 @@ export default function Customers() {
                             <td className='border border-slate-300 text-center'>
                                 <div className='flex justify-around items-center'>
                                     <span className='text-blue-400 cursor-pointer hover:text-blue-600 active:text-blue-800' onClick={() => onEdit('9876543214')}>{pencil}</span>
-                                    <span className='text-red-400 cursor-pointer hover:text-red-500 active:text-red-800'>{del}</span>
+                                    <span className='text-red-400 cursor-pointer hover:text-red-500 active:text-red-800' onClick={() => onDelete()}>{del}</span>
                                 </div>
                             </td>
                         </tr>
