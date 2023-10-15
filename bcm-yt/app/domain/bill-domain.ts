@@ -4,3 +4,14 @@ export interface IItem {
     price ?: number;
     quantity ?: number
 }
+
+export interface IBill {
+    customerMobile ?: string;
+    billNo ?: string;
+    amount ?: number;
+    billDate ?: string;
+    cashier ?: string;
+    counter ?: number;
+    mode ?: string;
+    items ?: Array<IItem>
+}

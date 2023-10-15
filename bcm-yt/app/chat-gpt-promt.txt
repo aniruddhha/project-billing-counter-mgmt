@@ -1,0 +1,19 @@
+export interface IBill {
+    customerMobile: string;
+    billNo: string;
+    amount: string;
+    billDate: string;
+    cashier: string;
+    counter: number;
+    mode: string;
+    items: Array<IItem>
+}
+
+export interface IItem {
+    id ?: string;
+    itemName ?: string;
+    price ?: number;
+    quantity ?: number
+}
+
+if this is my domain,  i need array of 20 json objects, make sure you will keep billNo unique in an array, and other keys should have duplicate values. do not give me code for creating data, supply me array with static data. data should be real.
