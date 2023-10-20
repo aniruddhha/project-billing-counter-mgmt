@@ -1,10 +1,11 @@
-import { Link } from '@remix-run/react'
+import { Link, useLoaderData } from '@remix-run/react'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { IBill } from '~/domain/bill-domain'
 
-export default function Bills() {
+import { json } from '@remix-run/node'
 
-    const [bills, setBills] = useState<IBill[]>([
+export async function loader() {
+    return json([
         {
             "customerMobile": "1234567890",
             "billNo": "BILL001",
@@ -392,9 +393,13 @@ export default function Bills() {
                 }
             ]
         }
-    ]
-    )
+    ])
+}
 
+export default function Bills() {
+
+    const bills = useLoaderData<typeof loader>()
+    
     const [filtered, setFiltered] = useState<IBill[]>(bills)
 
     const [localSearchFilter, setLocalSearchFilter] = useState<IBill>({
