@@ -1,13 +1,55 @@
-import { IItem } from '~/domain/bill-domain'
+import { IBill, IItem } from '~/domain/bill-domain'
 import { del } from '../icons'
 import { ChangeEvent, useEffect, useState } from 'react'
 
 import { v4 as uuidv4 } from 'uuid';
+import { ActionFunctionArgs, json, redirect } from '@remix-run/node';
+import { Form, useActionData } from '@remix-run/react';
 
 interface IpErr {
     itemName : { isInitial: boolean, msg: string, isValid: boolean };
     price: { isInitial: boolean, msg: string, isValid: boolean };
     quantity: { isInitial: boolean, msg: string, isValid: boolean }
+}
+
+export async function action( { request } : ActionFunctionArgs) {
+
+    const fd = await request.formData()
+
+    const customerMobile = String(fd.get('customerMobile'))
+    const items = fd.getAll('items')
+    const prices = fd.getAll('prices')
+    const quantities = fd.getAll('quantities')
+    const mode = String(fd.get('mode'))
+    const cashier = String(fd.get('cashier'))
+    const counter = Number(fd.get('counter'))
+    const amount = Number(fd.get('amount'))
+
+    console.log(items)
+    console.log(prices)
+    console.log(quantities)
+
+    if(items.length == 0 || prices.length == 0 || quantities.length == 0) {
+        return json({ msg : 'No Items Found', isFormValid: false })
+    }
+
+    const mobileRegex = /^[0-9]{10}$/
+    if(!customerMobile.match(mobileRegex)) {
+        return json({ msg : 'Invalid Mobile Number', isFormValid: false })
+    }
+
+    const processed = items.map( (item, index) => ({
+        'itemName' : String(item),
+        'price': prices[index],
+        'quantity' : quantities[index]
+    }))
+
+    console.log(processed)
+
+    const bill: IBill = { customerMobile, items: [...processed], prices, quantities, mode, cashier, counter, amount }
+
+    // return json({ customerMobile, items, prices, quantities, mode, cashier, counter, amount })
+    return redirect('../bills')
 }
 
 export default function NewBill() {
@@ -105,18 +147,23 @@ export default function NewBill() {
         }
     }
 
-    return (
-        <section className="container h-[100%]">
+    const ac = useActionData<typeof action>()
 
+    const { msg , isFormValid } = ac || {}
+
+    return (
+        <Form className="container h-[100%]" method='POST'>
+
+            { JSON.stringify(ac) }
             <div className="ml-5 mt-5">
-                <h1 className="text-4xl"> New bill </h1>
+                <h1 className="text-4xl"> New Bill </h1>
             </div>
 
             <div className="flex w-[95%] justify-between ml-5 mt-5">
                 <div className="flex w-[30%] justify-start items-end">
                     <div className="flex flex-col">
                         <label htmlFor="customerMobile">Mobile</label>
-                        <input type="text" id="customerMobile" placeholder="Mobile" className="bg-slate-200 h-10 p-2" />
+                        <input type="text" id="customerMobile" name='customerMobile' placeholder="Mobile" className="bg-slate-200 h-10 p-2" />
                     </div>
                     <input type="button" value="Serach" className="w-20 h-10 ml-3 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900" />
                 </div>
@@ -128,7 +175,7 @@ export default function NewBill() {
                     <div className="flex justify-between w-full">
                         <span>Cashier:</span>
                         <span>
-                            <select>
+                            <select name='cashier'>
                                 <option> Admin </option>
                                 <option> James </option>
                                 <option> Lora </option>
@@ -139,7 +186,7 @@ export default function NewBill() {
                     <div className="flex justify-between w-full">
                         <span>Counter:</span>
                         <span>
-                            <select>
+                            <select name='counter'>
                                 <option> 1 </option>
                                 <option> 2 </option>
                                 <option> 3 </option>
@@ -176,6 +223,13 @@ export default function NewBill() {
             </div>
 
             <div className='mt-5 ml-5 w-[80%]'>
+                {
+                    ac && !isFormValid && (
+                        <div className='bg-red-400 w-[100%] p-3 mb-5 text-white'>
+                            {msg}
+                        </div>
+                    )
+                }
                 <table className='table-fixed w-[100%] shadow-lg bg-white'>
                     <thead>
                         <tr className='h-10 bg-slate-100'>
@@ -192,9 +246,9 @@ export default function NewBill() {
                             billItems.map( ( { id, itemName, price, quantity }, ind) => (
                                     <tr className='h-10' key={id}>
                                         <td className='border border-slate-300 text-center'>{ind + 1}</td>
-                                        <td className='border border-slate-300 ml-3'><span className='ml-3'>{itemName}</span></td>
-                                        <td className='border border-slate-300 ml-3 text-center'><span className='ml-3'>{price}</span></td>
-                                        <td className='border border-slate-300 ml-3 text-center'><span className='ml-3'>{quantity}</span></td>
+                                        <td className='border border-slate-300 ml-3'><input type='text' name='items' className='w-[90%] whitespace-nowrap bg-white pl-2' value={itemName} readOnly/></td>
+                                        <td className='border border-slate-300 ml-3 text-center'><input type='text' name='prices' className='w-[90%] whitespace-nowrap bg-white pl-2' value={price} readOnly/></td>
+                                        <td className='border border-slate-300 ml-3 text-center'><input type='text' name='quantities' className='w-[90%] whitespace-nowrap bg-white pl-2' value={quantity} readOnly/></td>
                                         <td className='border border-slate-300 text-center'>{ (price || 0)  * (quantity || 0)}</td>
                                         <td className='border border-slate-300 text-center'>
                                             <div className='flex justify-center items-center'>
@@ -232,19 +286,18 @@ export default function NewBill() {
                             </th>
                         </tr>
 
-
                     </tbody>
                 </table>
             </div>
 
             <div className='flex flex-row-reverse w-[80%] ml-5 mt-5'>
                 <input type='submit' value='Checkout' className='w-20 h-10 ml-3 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900' />
-                <select className='border border-gray-400'>
+                <select className='border border-gray-400' name='mode'>
                     <option value='upi'>UPI</option>
                     <option value='card'>CARD</option>
                     <option value='cash'>Cash</option>
                 </select>
             </div>
-        </section>
+        </Form>
     )
 }
