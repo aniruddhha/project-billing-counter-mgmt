@@ -154,8 +154,7 @@ export default function NewBill() {
 
     return (
         <Form className="container h-[100%]" method='POST'>
-
-            { JSON.stringify(ac) }
+            
             <div className="ml-5 mt-5">
                 <h1 className="text-4xl"> New Bill </h1>
             </div>
