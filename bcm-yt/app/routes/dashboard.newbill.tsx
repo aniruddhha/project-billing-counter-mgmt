@@ -40,15 +40,16 @@ export async function action( { request } : ActionFunctionArgs) {
 
     const processed = items.map( (item, index) => ({
         'itemName' : String(item),
-        'price': prices[index],
-        'quantity' : quantities[index]
+        'price': Number(prices[index]),
+        'quantity' : Number(quantities[index])
     }))
 
     console.log(processed)
 
-    const bill: IBill = { customerMobile, items: [...processed], prices, quantities, mode, cashier, counter, amount }
+    const bill: IBill = { customerMobile, items: [...processed], mode, cashier, counter, amount }
 
-    // return json({ customerMobile, items, prices, quantities, mode, cashier, counter, amount })
+    // db query to save the bill
+
     return redirect('../bills')
 }
 

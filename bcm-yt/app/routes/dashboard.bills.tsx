@@ -1,8 +1,74 @@
-import { Link, useLoaderData } from '@remix-run/react'
+import { Form, Link, useActionData, useLoaderData } from '@remix-run/react'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { IBill } from '~/domain/bill-domain'
 
-import { json } from '@remix-run/node'
+import { ActionFunctionArgs, json } from '@remix-run/node'
+
+
+export async function action( { request } : ActionFunctionArgs) {
+
+    const fd = await request.formData()
+
+    const billNo = String(fd.get('billNo'))
+    const customerMobile = String(fd.get('customerMobile'))
+    const billDate = String(fd.get('billDate'))
+    const counter = Number(fd.get('counter'))
+    const cashier = String(fd.get('cashier'))
+
+    const bill: IBill = { billDate, billNo, customerMobile, counter, cashier }
+
+    // fire db query to filter the data
+
+    return json([
+        {
+            "customerMobile": "1234567890",
+            "billNo": "BILL001",
+            "amount": 100.00,
+            "billDate": "2000-01-01",
+            "cashier": "John Doe",
+            "counter": 1,
+            "mode": "Cash",
+            "items": [
+                {
+                    "id": "1",
+                    "itemName": "Item A",
+                    "price": 10.00,
+                    "quantity": 2
+                },
+                {
+                    "id": "2",
+                    "itemName": "Item B",
+                    "price": 5.00,
+                    "quantity": 3
+                }
+            ]
+        },
+        {
+            "customerMobile": "2345678901",
+            "billNo": "BILL002",
+            "amount": 75.50,
+            "billDate": "2023-10-15",
+            "cashier": "Jane Smith",
+            "counter": 2,
+            "mode": "Credit Card",
+            "items": [
+                {
+                    "id": "3",
+                    "itemName": "Item C",
+                    "price": 15.50,
+                    "quantity": 2
+                },
+                {
+                    "id": "4",
+                    "itemName": "Item D",
+                    "price": 20.00,
+                    "quantity": 2
+                }
+            ]
+        }
+    ])
+
+}
 
 export async function loader() {
     return json([
@@ -400,6 +466,8 @@ export default function Bills() {
 
     const bills = useLoaderData<typeof loader>()
     
+    const [filter, setFilter] = useState<IBill>({  customerMobile: '', counter: 0  })
+
     const [filtered, setFiltered] = useState<IBill[]>(bills)
 
     const [localSearchFilter, setLocalSearchFilter] = useState<IBill>({
@@ -421,6 +489,16 @@ export default function Bills() {
         setLocalSearchFilter( old => ({ ...old, [name]: value }))
     }
 
+    const onFltIpCh = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target
+
+        if ((name === 'counter' || name === 'customerMobile') && isNaN(Number(value))) return;
+
+        setFilter( old => ({ ...old, [name]: value }))
+    }
+
+    const ac = useActionData<typeof action>()
+
     useEffect( () => {
 
         const filtered = bills.filter( ( { billNo, customerMobile, amount, billDate, cashier, counter  } : IBill ) => {
@@ -439,6 +517,10 @@ export default function Bills() {
 
     }, [localSearchFilter] )
 
+    useEffect(() =>{
+        if(ac) setFiltered(ac)
+    }, [ac])
+
     return (
         <section className="container h-[100%]">
             <div className="flex justify-between ml-5 mt-5">
@@ -451,31 +533,31 @@ export default function Bills() {
             </div>
             <fieldset className='bg-slate-100 border w-[60%] h-[25%] mx-5 p-3 shadow-lg mt-5'>
                 <legend className='text-[0.8rem]'>Search Filter</legend>
-                <form className='grid grid-cols-3 gap-5'>
+                <Form method='POST' className='grid grid-cols-3 gap-5'>
                     <div className='flex flex-col'>
                         <label htmlFor="billNo">Bill No</label>
-                        <input id="billNo" type="text" className='h-10 p-2' placeholder='Bill No' />
+                        <input id="billNo" name="billNo" type="text" className='h-10 p-2' placeholder='Bill No' />
                     </div>
                     <div className='flex flex-col'>
                         <label htmlFor="customerMobile">Mobile</label>
-                        <input id="customerMobile" type="text" className='h-10 p-2' placeholder='Mobile' />
+                        <input id="customerMobile" name="customerMobile" type="text" className='h-10 p-2' placeholder='Mobile' value={filter.customerMobile} onChange={onFltIpCh} />
                     </div>
                     <div className='flex flex-col'>
                         <label htmlFor="billDate">Bill Date</label>
-                        <input id="billDate" type="date" className='h-10 p-2' />
+                        <input id="billDate" name="billDate" type="date" className='h-10 p-2' />
                     </div>
                     <div className='flex flex-col'>
                         <label htmlFor="counter">Counter</label>
-                        <input id="counter" type="number" className='h-10 p-2' placeholder='Counter' />
+                        <input id="counter" name="counter" type="number" className='h-10 p-2' placeholder='Counter' value={filter.counter} onChange={onFltIpCh} />
                     </div>
                     <div className='flex flex-col'>
                         <label htmlFor="cashier">Cashier</label>
-                        <input id="cashier" type="text" className='h-10 p-2' placeholder='Cashier' />
+                        <input id="cashier" name="cashier" type="text" className='h-10 p-2' placeholder='Cashier' />
                     </div>
                     <div className='flex justify-start items-end'>
-                        <input type="button" value='Search' className='w-20 h-10 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900' />
+                        <input type="submit" value='Search' className='w-20 h-10 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900' />
                     </div>
-                </form>
+                </Form>
             </fieldset>
 
             <div className='mt-8 ml-5 w-[100%] mr-5'>
