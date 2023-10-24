@@ -12,9 +12,9 @@ export interface ICustomerRepository {
 
     edit(cust: ICustomer): Promise<ICustomer>
 
-    delete(mobile: string): Promise<ICustomer>
+    delete(mobile: string): Promise<number>
 
-    details(mobile: string): Promise<ICustomer>
+    details(mobile: string): Promise<ICustomer|undefined>
 
     customers(): Promise<Array<ICustomer>>
 }
@@ -26,14 +26,17 @@ export class CustomerRepository implements ICustomerRepository {
        return cst.save()
     }
     async edit(cust: ICustomer): Promise<ICustomer> {
-        throw new Error("Method not implemented.");
+        return await Customer.findOneAndUpdate({ mobile: cust.mobile }, { $set: { ...cust } }).then()
     }
-    async delete(mobile: string): Promise<ICustomer> {
-        throw new Error("Method not implemented.");
+
+    async details(mobile: string): Promise<ICustomer|undefined> {
+        return Customer.findOne({ mobile }, { __v : 0}).then(cst => cst?.toObject())  
     }
-    async details(mobile: string): Promise<ICustomer> {
-        throw new Error("Method not implemented.");
+
+    async delete(mobile: string): Promise<number> {
+       return Customer.deleteOne({ mobile }).then( cst => cst.deletedCount )
     }
+   
     async customers(): Promise<ICustomer[]> {
         return Customer.find({}, { __v: 0 })
     }
