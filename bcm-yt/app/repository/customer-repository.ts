@@ -22,7 +22,6 @@ export class CustomerRepository implements ICustomerRepository {
     }
     
     async edit(cust: ICustomer): Promise<ICustomer | undefined> {
-        console.log(cust)
         return Customer.findOneAndUpdate({ mobile: cust.mobile }, { $set: { ...cust } }).then(cst => cst?.toObject())
     }
 
