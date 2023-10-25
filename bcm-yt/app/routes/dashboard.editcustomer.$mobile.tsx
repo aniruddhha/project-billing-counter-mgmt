@@ -3,6 +3,11 @@ import { validateFields } from '../customer.validations'
 import { ActionFunctionArgs, LoaderFunctionArgs, json, redirect } from "@remix-run/node"
 import { ChangeEvent, useState } from 'react'
 
+import { ICustomerRepository, CustomerRepository} from '../repository/customer-repository'
+import { ICustomer } from '~/domain/cutomer-domain'
+
+const customerRepository = new CustomerRepository()
+
 export async function action( { request } : ActionFunctionArgs ) {
 
     const fd = await request.formData()
@@ -21,22 +26,22 @@ export async function action( { request } : ActionFunctionArgs ) {
     const err = validateFields({ mobile, name, email, dob })
 
     if(err.dob.isValid && err.email.isValid && err.mobile.isValid && err.name.isValid) {
+
+        const customer : ICustomer = { name, mobile, email, dob }
+
+        await customerRepository.edit({ ...customer })
+
         return redirect('../customers')
     }
-
     return json({ err })
 }
 
 export async function loader({ params } : LoaderFunctionArgs) {
-    return json({
-        mobile : `${params.mobile}`,
-        name: 'abc',
-        email: 'aa@ww.com',
-        dob: '1990-01-01'
-    })
+
+    const customer: ICustomer | undefined = await customerRepository.details(`${params.mobile}`) 
+    
+    return json({ ...customer, dob: new Date(customer?.dob || '').toISOString().split('T')[0]})
 }
-
-
 
 export default function EditCustomer() {
 

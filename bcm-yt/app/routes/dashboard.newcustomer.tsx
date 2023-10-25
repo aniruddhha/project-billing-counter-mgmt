@@ -2,6 +2,11 @@ import { ActionFunctionArgs, json, redirect } from '@remix-run/node'
 import { Form, useActionData } from '@remix-run/react'
 import { validateFields } from '../customer.validations'
 
+import { ICustomerRepository, CustomerRepository} from '../repository/customer-repository'
+import { ICustomer } from '~/domain/cutomer-domain'
+
+const customerRepository = new CustomerRepository()
+
 export async function action( { request } : ActionFunctionArgs ) {
 
     const fd = await request.formData()
@@ -20,7 +25,16 @@ export async function action( { request } : ActionFunctionArgs ) {
     const err = validateFields({ mobile, name, email, dob })
 
     if(err.dob.isValid && err.email.isValid && err.mobile.isValid && err.name.isValid) {
-        return redirect('../customers')
+
+        const customer: ICustomer = { name, mobile, email, dob  }
+
+        // try {
+        const svd = await customerRepository.create(customer)
+        if(svd) return redirect('../customers')
+
+        // } catch (error) {
+        //     return json({ err : { msg : 'problem in saving' } })
+        // }
     }
 
     return json({ err })

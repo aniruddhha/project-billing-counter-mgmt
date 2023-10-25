@@ -3,136 +3,19 @@ import { del, pencil } from '../icons'
 
 import { AppDialog } from '~/dialog'
 import { ChangeEvent, useEffect, useState } from 'react'
-import { ICustomer } from '~/domain/cutomer-domain'
 
 import { json } from '@remix-run/node'
 
+import { ICustomerRepository, CustomerRepository} from '../repository/customer-repository'
+import { ICustomer } from '~/domain/cutomer-domain'
+
+const customerRepository = new CustomerRepository()
+
 export async function loader() {
     // db query
-
-    return json([
-            {
-                "name": "John Doe",
-                "mobile": "1234567890",
-                "email": "johndoe@example.com",
-                "dob": "1990-01-01"
-            },
-            {
-                "name": "Jane Smith",
-                "mobile": "2345678901",
-                "email": "janesmith@example.com",
-                "dob": "1990-02-02"
-            },
-            {
-                "name": "David Johnson",
-                "mobile": "3456789012",
-                "email": "davidjohnson@example.com",
-                "dob": "1990-03-03"
-            },
-            {
-                "name": "Alice Davis",
-                "mobile": "4567890123",
-                "email": "alicedavis@example.com",
-                "dob": "1990-04-04"
-            },
-            {
-                "name": "Bob Wilson",
-                "mobile": "5678901234",
-                "email": "bobwilson@example.com",
-                "dob": "1990-05-05"
-            },
-            {
-                "name": "Ella Martinez",
-                "mobile": "6789012345",
-                "email": "ellamartinez@example.com",
-                "dob": "1990-06-06"
-            },
-            {
-                "name": "Mike Brown",
-                "mobile": "7890123456",
-                "email": "mikebrown@example.com",
-                "dob": "1990-07-07"
-            },
-            {
-                "name": "Sophia Lee",
-                "mobile": "8901234567",
-                "email": "sophialee@example.com",
-                "dob": "1990-08-08"
-            },
-            {
-                "name": "Oliver Taylor",
-                "mobile": "9012345678",
-                "email": "olivertaylor@example.com",
-                "dob": "1990-09-09"
-            },
-            {
-                "name": "Mia Miller",
-                "mobile": "0123456789",
-                "email": "miamiller@example.com",
-                "dob": "1990-10-10"
-            },
-            {
-                "name": "William Wilson",
-                "mobile": "1023456789",
-                "email": "williamwilson@example.com",
-                "dob": "1991-11-11"
-            },
-            {
-                "name": "Linda Johnson",
-                "mobile": "1123456789",
-                "email": "lindajohnson@example.com",
-                "dob": "1992-12-12"
-            },
-            {
-                "name": "Michael Miller",
-                "mobile": "1223456789",
-                "email": "michaelmiller@example.com",
-                "dob": "1993-01-13"
-            },
-            {
-                "name": "Barbara Taylor",
-                "mobile": "1323456789",
-                "email": "barbarataylor@example.com",
-                "dob": "1994-02-14"
-            },
-            {
-                "name": "David Smith",
-                "mobile": "1423456789",
-                "email": "davidsmith@example.com",
-                "dob": "1995-03-15"
-            },
-            {
-                "name": "Sarah Wilson",
-                "mobile": "1523456789",
-                "email": "sarahwilson@example.com",
-                "dob": "1996-04-16"
-            },
-            {
-                "name": "Robert Johnson",
-                "mobile": "1623456789",
-                "email": "robertjohnson@example.com",
-                "dob": "1997-05-17"
-            },
-            {
-                "name": "Karen Miller",
-                "mobile": "1723456789",
-                "email": "karenmiller@example.com",
-                "dob": "1998-06-18"
-            },
-            {
-                "name": "James Taylor",
-                "mobile": "1823456789",
-                "email": "jamestaylor@example.com",
-                "dob": "1999-07-19"
-            },
-            {
-                "name": "Susan Johnson",
-                "mobile": "1923456789",
-                "email": "susanjohnson@example.com",
-                "dob": "2000-08-20"
-            }
-        ]
-    )
+    const customers = await customerRepository.customers()
+    console.log(customers)
+    return json(customers)
 }
 
 export default function Customers() {
@@ -152,7 +35,6 @@ export default function Customers() {
     }
 
     useEffect(() => {
-
         const flt = customers.filter(({ mobile }: ICustomer) => serachMobile ? mobile.includes(serachMobile) : true)
         setFiltered(flt)
 
@@ -210,7 +92,7 @@ export default function Customers() {
                                     <td className='border border-slate-300 ml-3'><span className='ml-3'><Link to={`../customerdetails/${mobile}`}><u>{mobile}</u></Link></span></td>
                                     <td className='border border-slate-300 ml-3'><span className='ml-3'>{name}</span></td>
                                     <td className='border border-slate-300 ml-3'><span className='ml-3'>{email}</span></td>
-                                    <td className='border border-slate-300 text-center'>{dob}</td>
+                                    <td className='border border-slate-300 text-center'>{new Date(dob).toISOString().split('T')[0]}</td>
                                     <td className='border border-slate-300 text-center'>
                                         <div className='flex justify-around items-center'>
                                             <span className='text-blue-400 cursor-pointer hover:text-blue-600 active:text-blue-800' onClick={() => onEdit(mobile)}>{pencil}</span>
