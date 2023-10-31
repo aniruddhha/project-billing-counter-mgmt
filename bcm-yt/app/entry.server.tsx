@@ -12,6 +12,8 @@ import { RemixServer } from "@remix-run/react";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 
+import { connect } from "mongoose";
+
 const ABORT_DELAY = 5_000;
 
 export default function handleRequest(
@@ -135,3 +137,15 @@ function handleBrowserRequest(
     setTimeout(abort, ABORT_DELAY);
   });
 }
+
+async function run() {
+  try {
+    await connect('mongodb://127.0.0.1:27017/bcmytdb')
+    console.log(`🟢 Connected to Db 🟢`)
+  } catch (error) {
+    console.error(`🔴 Error In Mongo Connectivity 🔴`) 
+    console.log(error)   
+  }
+}
+
+run()

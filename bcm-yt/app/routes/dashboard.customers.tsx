@@ -1,20 +1,34 @@
-import { Link, useNavigate, useLoaderData } from '@remix-run/react'
+import { Link, useNavigate, useLoaderData, Form, useActionData } from '@remix-run/react'
 import { del, pencil } from '../icons'
 
 import { AppDialog } from '~/dialog'
 import { ChangeEvent, useEffect, useState } from 'react'
 
-import { json } from '@remix-run/node'
+import { ActionFunctionArgs, json } from '@remix-run/node'
 
-import { ICustomerRepository, CustomerRepository} from '../repository/customer-repository'
+import { CustomerRepository } from '../repository/customer-repository'
 import { ICustomer } from '~/domain/cutomer-domain'
 
 const customerRepository = new CustomerRepository()
 
+
+export async function action({ request } : ActionFunctionArgs) {
+   
+    const fd = await request.formData()
+
+    const mobile = String(fd.get('mobile'))
+
+    console.log(`Action Called ${mobile}`)
+
+    const dltCnt = await customerRepository.delete(mobile)
+    
+    if(dltCnt) return json({ isDeleted : true })
+    return json({ isDeleted : false })
+}
+
 export async function loader() {
     // db query
     const customers = await customerRepository.customers()
-    console.log(customers)
     return json(customers)
 }
 
@@ -22,11 +36,15 @@ export default function Customers() {
 
     const customers = useLoaderData<typeof loader>()
 
+    const ac = useActionData<typeof action>()
+
     const [filtered, setFiltered] = useState<ICustomer[]>(customers)
 
     const [serachMobile, setSearchMobile] = useState<string>('')
 
     const [isDlgVs, setDlgVs] = useState<boolean>(false)
+
+    const [dltMbl, setDltMbl] = useState<string>('')
 
     const onIpCh = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -40,6 +58,10 @@ export default function Customers() {
 
     }, [serachMobile])
 
+    useEffect(() => {
+        setDlgVs(false)
+    }, [ac])
+
 
     const navigate = useNavigate()
 
@@ -47,19 +69,26 @@ export default function Customers() {
         navigate(`../editcustomer/${mobile}`)
     }
 
-    const onDelete = () => {
+    const onDelete = (mobile : string) => {
         setDlgVs(true)
+        setDltMbl(mobile)
+    }
+
+    const onDlgOk = async () => {
+        // customerRepository.delete('98888889') // this incorrect
+        setDlgVs(false)
     }
 
     return (
         <section className="container h-[100%]">
 
-            {isDlgVs && (
+            { isDlgVs && (
                 <AppDialog
-                    onOk={() => setDlgVs(false)}
+                    onOk={onDlgOk}
                     onClose={() => setDlgVs(false)}
-                    msg='Do want to Delete ?'
-                    ttl='Confirmation'
+                    msg={`Do want to Delete ?`}
+                    ttl={'Confirmation'}
+                    mobile={dltMbl}
                 />
             )
             }
@@ -96,7 +125,7 @@ export default function Customers() {
                                     <td className='border border-slate-300 text-center'>
                                         <div className='flex justify-around items-center'>
                                             <span className='text-blue-400 cursor-pointer hover:text-blue-600 active:text-blue-800' onClick={() => onEdit(mobile)}>{pencil}</span>
-                                            <span className='text-red-400 cursor-pointer hover:text-red-500 active:text-red-800' onClick={() => onDelete()}>{del}</span>
+                                            <span className='text-red-400 cursor-pointer hover:text-red-500 active:text-red-800' onClick={() => onDelete(mobile)}>{del}</span>
                                         </div>
                                     </td>
                                 </tr>
