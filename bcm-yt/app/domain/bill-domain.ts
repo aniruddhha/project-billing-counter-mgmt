@@ -1,3 +1,5 @@
+import { Schema, model } from "mongoose";
+
 export interface IItem {
     id ?: string;
     itemName ?: string;
@@ -15,3 +17,16 @@ export interface IBill {
     mode ?: string;
     items ?: Array<IItem>
 }
+
+const billSchema = new Schema<IBill>({
+    customerMobile: { type: String },
+    billNo: { type: String },
+    amount: { type: Number},
+    billDate: { type: Date },
+    cashier: { type: String },
+    counter:{ type: Number },
+    mode: { type: String },
+    items: { type: [{ itemName: String, price: Number, quantity: Number  }] }
+})
+
+export const Bill = model<IBill>('Bill', billSchema)
