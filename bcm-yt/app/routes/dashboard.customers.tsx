@@ -11,7 +11,6 @@ import { ICustomer } from '~/domain/cutomer-domain'
 
 const customerRepository = new CustomerRepository()
 
-
 export async function action({ request } : ActionFunctionArgs) {
    
     const fd = await request.formData()
@@ -58,10 +57,13 @@ export default function Customers() {
 
     }, [serachMobile])
 
+    useEffect(() =>{
+        setFiltered(customers)
+    }, [customers])
+
     useEffect(() => {
         setDlgVs(false)
     }, [ac])
-
 
     const navigate = useNavigate()
 
