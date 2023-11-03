@@ -5,6 +5,11 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid';
 import { ActionFunctionArgs, json, redirect } from '@remix-run/node';
 import { Form, useActionData } from '@remix-run/react';
+import { CustomerRepository } from '~/repository/customer-repository';
+import { BillRepository } from '~/repository/bill-repository';
+
+const customerRepository = new CustomerRepository()
+const billRepository = new BillRepository()
 
 interface IpErr {
     itemName: { isInitial: boolean, msg: string, isValid: boolean };
@@ -12,9 +17,30 @@ interface IpErr {
     quantity: { isInitial: boolean, msg: string, isValid: boolean }
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+async function isCustomerAvailable(mobile: string) {
+    const cst = await customerRepository.details(mobile)
+    return !!cst    
+}
 
-    const fd = await request.formData()
+
+async function onChkCstAv(fd: FormData) {
+
+    const customerMobile = String(fd.get('customerMobile'))
+
+    const mobileRegex = /^[0-9]{10}$/
+    if (!customerMobile.match(mobileRegex)) {
+        return json({ msg: 'Invalid Mobile Number', isCstAv: false , isFormValid: false })
+    }
+
+    const isCstAv = await isCustomerAvailable(customerMobile)
+    if (isCstAv) {
+        return json({ msg: 'Customer Found', isCstAv, isFormValid: true })
+    }
+    return json({ msg: 'Customer Not Found', isCstAv,  isFormValid: false })
+
+}
+
+async function onChkOt(fd: FormData) {
 
     const customerMobile = String(fd.get('customerMobile'))
     const items = fd.getAll('items')
@@ -25,28 +51,18 @@ export async function action({ request }: ActionFunctionArgs) {
     const counter = Number(fd.get('counter'))
     const amount = Number(fd.get('amount'))
 
-    console.log(amount)
-
     const mobileRegex = /^[0-9]{10}$/
     if (!customerMobile.match(mobileRegex)) {
-        return json({ msg: 'Invalid Mobile Number', isFormValid: false })
+        return json({ msg: 'Invalid Mobile Number', isCstAv: false , isFormValid: false })
     }
 
-    if (customerMobile && mode === 'null') {
-        console.log(`Form Submitted -> Checking Mobile`)
-
-        // db query
-
-        return json({ msg: 'Customer Not Found', isFormValid: false })
+    const isCstAv = await isCustomerAvailable(customerMobile)
+    if (!isCstAv) {
+        return json({ msg: 'Customer Not Found', isCstAv, isFormValid: false })
     }
-    console.log(`Form Submitted -> Checkout`)
-
-    console.log(items)
-    console.log(prices)
-    console.log(quantities)
 
     if (items.length == 0 || prices.length == 0 || quantities.length == 0) {
-        return json({ msg: 'No Items Found', isFormValid: false })
+        return json({ msg: 'No Items Found', isCstAv, isFormValid: false })
     }
 
     const processed = items.map((item, index) => ({
@@ -57,14 +73,31 @@ export async function action({ request }: ActionFunctionArgs) {
 
     console.log(processed)
 
-    const bill: IBill = { customerMobile, items: [...processed], mode, cashier, counter, amount }
+    const billDate = new Date().toString()
+    const smNo = uuidv4()
+    const billNo = `BILL-${smNo.split('-')[0]}`
+    const bill: IBill = { billNo, customerMobile, items: [...processed], mode, cashier, billDate, counter, amount }
 
     // db query to save the bill
+    await billRepository.newBill(bill)
 
     return redirect('../bills')
 }
 
+export async function action({ request }: ActionFunctionArgs) {
+
+    const fd = await request.formData()
+
+    const subTyp = String(fd.get('subTyp'))
+
+    if (subTyp == 'cstAv') return onChkCstAv(fd)
+    return onChkOt(fd)
+}
+
 export default function NewBill() {
+
+    const ac = useActionData<typeof action>()
+    const { msg, isFormValid } = ac || {}
 
     const [billItems, setBillItems] = useState<IItem[]>([])
 
@@ -78,7 +111,7 @@ export default function NewBill() {
     const [total, setTotal] = useState<number>(0)
     const [gst, setGst] = useState<number>(0)
 
-    const [isCstAv, setCstAv] = useState<boolean>(true)
+    const [isCstAv, setCstAv] = useState<boolean>(false)
 
     const [errors, setErrors] = useState<IpErr>({
         itemName: { isInitial: true, msg: 'Mandetory', isValid: false },
@@ -126,6 +159,10 @@ export default function NewBill() {
 
     }, [errors])
 
+    useEffect(() => {
+        setCstAv(ac?.isCstAv || false)
+    }, [ac])
+
     const validateItems = () => {
         if (billItem.itemName === undefined || billItem.itemName === '' || billItem.itemName.trim() === '') {
             // error: Invalid Item Name
@@ -161,10 +198,6 @@ export default function NewBill() {
         }
     }
 
-    const ac = useActionData<typeof action>()
-
-    const { msg, isFormValid } = ac || {}
-
     return (
         <Form className="container h-[100%]" method='POST'>
 
@@ -178,7 +211,8 @@ export default function NewBill() {
                         <label htmlFor="customerMobile">Mobile</label>
                         <input type="text" id="customerMobile" name='customerMobile' placeholder="Mobile" className="bg-slate-200 h-10 p-2" />
                     </div>
-                    <input type="submit" value="Search" className="w-20 h-10 ml-3 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900" />
+                    {/* <input type="submit" value="Search" className="w-20 h-10 ml-3 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900" /> */}
+                    <button type="submit" name='subTyp' value='cstAv' className="w-20 h-10 ml-3 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900" >Search</button>
                 </div>
 
                 <div className="flex flex-col w-[15%] items-end bg-slate-100 shadow-lg p-3">
@@ -210,7 +244,7 @@ export default function NewBill() {
                     </div>
                 </div>
             </div>
-           
+
             <hr className="m-5" />
 
             <div className="flex w-[95%] ml-5 mt-5">
@@ -311,7 +345,8 @@ export default function NewBill() {
                         </div>
 
                         <div className='flex flex-row-reverse w-[80%] ml-5 mt-5'>
-                            <input type='submit' value='Checkout' className='w-20 h-10 ml-3 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900' />
+                            {/* <input type='submit' value='Checkout' className='w-20 h-10 ml-3 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900' /> */}
+                            <button type='submit' name='subTyp' value='chk' className='w-20 h-10 ml-3 text-white bg-blue-500 hover:bg-blue-700 active:bg-blue-900' >Checkout</button>
                             <select className='border border-gray-400' name='mode'>
                                 <option value='upi'>UPI</option>
                                 <option value='card'>CARD</option>
