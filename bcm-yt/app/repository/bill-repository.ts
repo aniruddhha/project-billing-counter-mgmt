@@ -2,9 +2,9 @@ import { Bill, IBill } from "~/domain/bill-domain";
 
 export interface IBillRepository {
 
-    newBill(bill: IBill):Promise<IBill>
+    newBill(bill: IBill): Promise<IBill>
 
-    details(billNo: string): Promise<IBill|undefined>
+    details(billNo: string): Promise<IBill | undefined>
 
     bills(): Promise<Array<IBill>>
 
@@ -15,24 +15,31 @@ export interface IBillRepository {
 
 export class BillRepository implements IBillRepository {
     async newBill(bill: IBill): Promise<IBill> {
-       const bl = new Bill(bill)
-       return bl.save()
+        const bl = new Bill(bill)
+        return bl.save()
     }
-    async details(billNo: string): Promise<IBill| undefined> {
-       return Bill.findOne({ billNo }).then(bl => bl?.toObject())
+    async details(billNo: string): Promise<IBill | undefined> {
+        return Bill.findOne({ billNo }).then(bl => bl?.toObject())
     }
     async bills(): Promise<IBill[]> {
-       return Bill.find({}, { __v:0, items: 0 })
+        return Bill.find({}, { __v: 0, items: 0 })
     }
     async searchBills(opts: IBill): Promise<IBill[]> {
-    //    const ob =  { billNo :'cadcf', billDate: '123'  }
-    //    const arr = [ { billNo :'cadcf'}, { billDate: '123' }]
 
-        if(Object.values(opts).every(vl => !vl)) return Bill.find({})
+        if (Object.values(opts).every(vl => !vl)) return Bill.find({})
 
-        const arr = Object.entries(opts).map( ([key, value]) => ({ [key] : value }) )
+        const cleaned = [];
+        for (const [key, value] of Object.entries(opts)) {
+            if (value) {
+                if (key === 'cashier' || key === 'billNo') {
+                    cleaned.push({ [key]: { $regex: new RegExp(value, 'i') } });
+                } else {
+                    cleaned.push({ [key]: value });
+                }
+            }
+        }
 
-        return Bill.find({ $or : arr })
+        return Bill.find({ $or: cleaned })
     }
     async recent(customerMobile: string, count: number): Promise<IBill[]> {
         return Bill.find({ customerMobile }).sort({ billDate: -1 }).limit(count)

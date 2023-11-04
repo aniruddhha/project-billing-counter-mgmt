@@ -19,57 +19,9 @@ export async function action( { request } : ActionFunctionArgs) {
 
     const bill: IBill = { billDate, billNo, customerMobile, counter, cashier }
 
-    // fire db query to filter the data
+    const bills = await billRepository.searchBills(bill)
 
-    return json([
-        {
-            "customerMobile": "1234567890",
-            "billNo": "BILL001",
-            "amount": 100.00,
-            "billDate": "2000-01-01",
-            "cashier": "John Doe",
-            "counter": 1,
-            "mode": "Cash",
-            "items": [
-                {
-                    "id": "1",
-                    "itemName": "Item A",
-                    "price": 10.00,
-                    "quantity": 2
-                },
-                {
-                    "id": "2",
-                    "itemName": "Item B",
-                    "price": 5.00,
-                    "quantity": 3
-                }
-            ]
-        },
-        {
-            "customerMobile": "2345678901",
-            "billNo": "BILL002",
-            "amount": 75.50,
-            "billDate": "2023-10-15",
-            "cashier": "Jane Smith",
-            "counter": 2,
-            "mode": "Credit Card",
-            "items": [
-                {
-                    "id": "3",
-                    "itemName": "Item C",
-                    "price": 15.50,
-                    "quantity": 2
-                },
-                {
-                    "id": "4",
-                    "itemName": "Item D",
-                    "price": 20.00,
-                    "quantity": 2
-                }
-            ]
-        }
-    ])
-
+    return json(bills)
 }
 
 export async function loader() {

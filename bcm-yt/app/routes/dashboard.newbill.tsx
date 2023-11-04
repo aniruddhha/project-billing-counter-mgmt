@@ -73,9 +73,9 @@ async function onChkOt(fd: FormData) {
 
     console.log(processed)
 
-    const billDate = new Date().toString()
+    const billDate = new Date().toISOString().split('T')[0]
     const smNo = uuidv4()
-    const billNo = `BILL-${smNo.split('-')[0]}`
+    const billNo = `BILL${smNo.split('-')[0]}`
     const bill: IBill = { billNo, customerMobile, items: [...processed], mode, cashier, billDate, counter, amount }
 
     // db query to save the bill
@@ -218,7 +218,7 @@ export default function NewBill() {
                 <div className="flex flex-col w-[15%] items-end bg-slate-100 shadow-lg p-3">
                     <div className="flex justify-between w-full">
                         <span>Date:</span>
-                        <span>2020-01-01</span>
+                        <span>{new Date().toISOString().split('T')[0]}</span>
                     </div>
                     <div className="flex justify-between w-full">
                         <span>Cashier:</span>
