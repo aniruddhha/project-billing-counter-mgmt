@@ -16,9 +16,11 @@
     "@remix-run/react": "^2.0.1",
     "@remix-run/serve": "^2.0.1",
     "@types/uuid": "^9.0.5",
+    "chart.js": "^4.4.0",
     "isbot": "^3.6.8",
     "mongoose": "^7.6.3",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "uuid": "^9.0.1"
   },

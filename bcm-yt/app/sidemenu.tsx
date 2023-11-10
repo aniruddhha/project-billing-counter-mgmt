@@ -61,7 +61,6 @@ export function SideMenu() {
                     </ul>
                 )
                 }
-                <li className="p-3 hover:bg-blue-500 hover:text-white">Analytics</li>
             </ul>
         </aside>
     )
