@@ -1,30 +1,25 @@
 import { LoaderFunctionArgs, json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { IBill } from '~/domain/bill-domain'
-import { ICustomer } from '~/domain/cutomer-domain'
+
+import { BillRepository } from '~/repository/bill-repository';
+import { CustomerRepository } from '../repository/customer-repository'
+
+const billRepository = new BillRepository()
+const customerRepository = new CustomerRepository()
 
 export async function loader( { params } : LoaderFunctionArgs ) {
 
-    const cstDtls: ICustomer = {
-        name: 'Abc',
-        mobile : `${params.mobile}`,
-        dob:'1990-01-01',
-        email: 'aa@dd.com'
-    }
+    const cstDtls = await customerRepository.details(`${params.mobile}`)
 
-    const rcTxns : IBill[] = [
-       { billNo: 'BIL001', billDate:'2020-01-01', amount:180, mode:'UPI' },
-       { billNo: 'BIL010', billDate:'2020-03-01', amount:360, mode:'CASH' },
-       { billNo: 'BIL110', billDate:'2021-01-01', amount:9876, mode:'CARD' }
-    ]
+    const rcTxns = await billRepository.recent(`${params.mobile}`, 3)
     
     return json({ cstDtls, rcTxns })
 }
 
-
 export default function CustomerDeatils() {
     const { cstDtls, rcTxns  } = useLoaderData<typeof loader>()
-    const { mobile, name, dob, email } = cstDtls
+    const { mobile, name, dob, email } = cstDtls || {}
 
     return (
         <section>
@@ -35,7 +30,7 @@ export default function CustomerDeatils() {
                 <label>MOBILE</label><label className="border-l border-slate-400 pl-2">{mobile}</label>
                 <label>NAME</label><label className="border-l border-slate-400 pl-2">{name}</label>
                 <label>EMAIL</label><label className="border-l border-slate-400 pl-2">{email}</label>
-                <label>DOB</label><label className="border-l border-slate-400 pl-2">{dob}</label>
+                <label>DOB</label><label className="border-l border-slate-400 pl-2">{dob?.split('T')[0]}</label>
             </div>
             <div className="mt-5 ml-5">
                 <label className="text-slate-400">Recent Transactions</label>
@@ -57,7 +52,7 @@ export default function CustomerDeatils() {
                                 <tr className='h-10'>
                                 <td className='border border-slate-300 text-center'>{ind + 1}</td>
                                 <td className='border border-slate-300 ml-3'><span className='ml-3'>{billNo}</span></td>
-                                <td className='border border-slate-300 ml-3 text-center'><span className='ml-3'>{billDate}</span></td>
+                                <td className='border border-slate-300 ml-3 text-center'><span className='ml-3'>{billDate?.split('T')[0]}</span></td>
                                 <td className='border border-slate-300 ml-3 text-center'><span className='ml-3'>{amount}</span></td>
                                 <td className='border border-slate-300 text-center'>{mode}</td>
                             </tr>

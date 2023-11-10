@@ -4,24 +4,17 @@ import { IBill, IItem } from '~/domain/bill-domain'
 
 import { useEffect, useState } from 'react'
 
+import { BillRepository } from '~/repository/bill-repository';
+
+const billRepository = new BillRepository()
+
 export async function loader( { params } : LoaderFunctionArgs ) {
 
     console.log(params)
 
-    const blDtls: IBill = {
-        billNo:params.billNo,
-        customerMobile: '9876543221',
-        mode: 'UPI',
-        billDate: '2020-01-01',
-        cashier: 'abc',
-        counter: 1
-    }
+    const blDtls: IBill = await billRepository.details(`${params.billNo}`) || {}
 
-    const itms : IItem[] = [
-        { itemName: 'pen', price: 20, quantity: 20 },
-        { itemName: 'pencil', price: 5, quantity: 100 },
-        { itemName: 'eraser', price: 3, quantity: 430 },
-    ]
+    const itms = blDtls.items || []
     
     return json({ blDtls, itms })
 }
@@ -72,7 +65,7 @@ export default function BillDeatils() {
                 <div className="flex flex-col w-[20%] items-end bg-slate-100 shadow-lg p-3">
                     <div className="flex justify-between w-full">
                         <span>Date:</span>
-                        <span>{billDate}</span>
+                        <span>{billDate?.split('T')[0]}</span>
                     </div>
                     <div className="flex justify-between w-full">
                         <span>Cashier:</span>
