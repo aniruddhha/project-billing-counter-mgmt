@@ -3,6 +3,10 @@ import { Form, useActionData } from "@remix-run/react";
 import { json, redirect } from "react-router";
 import { validateFields } from '../user.validations'
 
+import { AppUserRepository } from '../repository/app-user-repository'
+
+const repository = new AppUserRepository()
+
 export const meta: MetaFunction = () => {
   return [
     { title: "New Remix App" },
@@ -15,16 +19,17 @@ export async function action( { request } : ActionFunctionArgs) {
   const fd = await request.formData()
 
   const email = String(fd.get('email'))
-  const passowrd = String(fd.get('password'))
+  const password = String(fd.get('password'))
 
-  const err = validateFields(email, passowrd)
+  const err = validateFields(email, password)
 
   if(!err.email.isValid || !err.password.isValid) {
     return json({ valErr : err })
   }
 
   //db check
-  if(email == 'abc@g.com' && passowrd == 'abc') {
+  const user = await repository.login({ email, password })
+  if(user) {
     return redirect('./dashboard')
   }
 
