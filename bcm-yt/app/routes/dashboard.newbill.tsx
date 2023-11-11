@@ -73,7 +73,7 @@ async function onChkOt(fd: FormData) {
 
     console.log(processed)
 
-    const billDate = new Date().toISOString().split('T')[0]
+    const billDate = new Date('2023-02-01').toISOString().split('T')[0]
     const smNo = uuidv4()
     const billNo = `BILL${smNo.split('-')[0]}`
     const bill: IBill = { billNo, customerMobile, items: [...processed], mode, cashier, billDate, counter, amount }

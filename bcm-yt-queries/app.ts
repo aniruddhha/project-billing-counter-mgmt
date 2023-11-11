@@ -3,6 +3,7 @@ import { CustomerRepository, ICustomerRepository } from "./customer-repository";
 import { BillRepository, IBillRepository } from "./bill-repository";
 import { ICustomer } from "./customer-domain";
 import { AppUserRepository, IUserRepository } from "./user-repository";
+import { totalMonthlySell, totalProductSell } from "./analytics-repository";
 
 async function customerApi() {
     const repo: ICustomerRepository = new CustomerRepository()
@@ -75,8 +76,10 @@ async function billApi() {
     console.log(await repo.recent('1234567890',3))
 }
 
-function analyticsApi() {
+async function analyticsApi() {
+    // totalMonthlySell()
 
+    totalProductSell()
 }
 
 async function userApi() {
@@ -96,10 +99,12 @@ async function run() {
 
     // await billApi()
 
-    await userApi()
+    // await userApi()
 
-    await disconnect()
-    console.log(`🔴 Disconnected 🔴`)
+    await analyticsApi()
+
+    // await disconnect()
+    // console.log(`🔴 Disconnected 🔴`)
 }
 
 run().catch(err => {

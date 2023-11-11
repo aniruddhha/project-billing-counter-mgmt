@@ -70,6 +70,7 @@ const pieData = {
     ]
 }
 
+
 export default function DashboardIndex() {
 
     return (
