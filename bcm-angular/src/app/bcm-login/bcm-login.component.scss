@@ -1,0 +1,22 @@
+.white-card {
+    background-color: white;
+}
+
+.big-header {
+    font-size: 3em;
+
+}
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.lgn-frm {
+    width: 20vw;
+    display: flex;
+    flex-direction: column;
+}

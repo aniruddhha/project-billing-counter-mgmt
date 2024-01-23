@@ -1,0 +1,20 @@
+<main class="white-card container">
+    <h1>LOGIN</h1>
+      <form class="lgn-frm" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <mat-form-field>
+          <input matInput placeholder="Username" type="text" formControlName="userName" required>
+          <!-- <mat-error *ngIf="loginForm.get('username').hasError('required')">
+            Username is required.
+          </mat-error> -->
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Password" type="password" formControlName="password" required>
+          <!-- <mat-error *ngIf="loginForm.get('password').hasError('required')">
+            Password is required.
+          </mat-error> -->
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="submit" >Login</button>
+      </form>
+   
+    </main>
+  
