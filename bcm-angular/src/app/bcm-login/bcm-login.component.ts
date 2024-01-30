@@ -7,7 +7,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
-
  
 
 @Component({
@@ -19,7 +18,7 @@ import {MatButtonModule} from '@angular/material/button';
     MatCardModule,
     MatFormFieldModule, 
     MatInputModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   templateUrl: './bcm-login.component.html',
   styleUrl: './bcm-login.component.scss'
@@ -27,6 +26,7 @@ import {MatButtonModule} from '@angular/material/button';
 export class BcmLoginComponent {
 
     loginForm : FormGroup
+    
     constructor(
       private router: Router,
       private fb: FormBuilder,

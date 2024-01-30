@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NavCommunicationService } from '../nav-communication.service';
 
 @Component({
   selector: 'app-bcm-nav',
@@ -9,4 +10,13 @@ import { Component } from '@angular/core';
 })
 export class BcmNavComponent {
 
+  constructor(
+    private navCom : NavCommunicationService
+  ) {
+
+  }
+
+  onDrawerMenuClicked() {
+    this.navCom.setDrawerState(true)
+  }
 }
