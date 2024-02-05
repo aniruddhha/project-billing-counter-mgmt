@@ -17,6 +17,6 @@ export class BcmNavComponent {
   }
 
   onDrawerMenuClicked() {
-    this.navCom.setDrawerState(true)
+    this.navCom.setDrawerState()
   }
 }

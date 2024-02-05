@@ -9,7 +9,7 @@ export class NavCommunicationService {
 
   constructor() { }
 
-  setDrawerState(st : boolean) {
+  setDrawerState() {
     this.isDrawerOpen.update( prv => !prv)
   }
 

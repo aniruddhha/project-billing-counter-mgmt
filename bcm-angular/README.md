@@ -16,3 +16,6 @@
 
 ## Day 8
 - Worked dashboard Nav and side menu
+
+## Day 9
+- Other work
